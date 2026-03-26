@@ -1,0 +1,22 @@
+{
+  "name": "@gather/plugin-sdk",
+  "version": "0.1.0",
+  "description": "SDK for building Gather plugins",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chrismuccioli/gather-plugin-sdk.git"
+  },
+  "keywords": ["gather", "plugin", "sdk"],
+  "devDependencies": {
+    "typescript": "^5"
+  },
+  "license": "MIT"
+}
