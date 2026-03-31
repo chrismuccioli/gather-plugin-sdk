@@ -37,6 +37,20 @@ export interface AddCommentOptions {
     parentId?: string;
     timecodeMs?: number;
 }
+export interface Preset {
+    id: string;
+    key: string;
+    name: string;
+    data: Record<string, unknown>;
+    createdBy: string;
+    createdAt: string;
+    updatedAt: string;
+}
+export interface SavePresetOptions {
+    key: string;
+    name: string;
+    data: Record<string, unknown>;
+}
 export interface ServiceProxy {
     /** Check if a service is available in the workspace. */
     isAvailable(): Promise<boolean>;
@@ -77,6 +91,28 @@ export declare class GatherPlugin {
     listPlots(): Promise<Plot[]>;
     /** Add a comment to a target in a plot. Requires comments:write scope. */
     addComment(plotId: string, options: AddCommentOptions): Promise<unknown>;
+    /**
+     * List all presets saved by this plugin in the workspace.
+     * Requires scope: presets:read
+     */
+    listPresets(): Promise<Preset[]>;
+    /**
+     * Get a single preset by its key.
+     * Returns null if the preset does not exist.
+     * Requires scope: presets:read
+     */
+    getPreset(key: string): Promise<Preset | null>;
+    /**
+     * Create or update a preset. If a preset with the given key already exists,
+     * it will be overwritten.
+     * Requires scope: presets:write
+     */
+    savePreset(options: SavePresetOptions): Promise<Preset>;
+    /**
+     * Delete a preset by its key.
+     * Requires scope: presets:write
+     */
+    deletePreset(key: string): Promise<void>;
     /** Get a service proxy for making proxied calls to workspace services. */
     service(serviceName: string): ServiceProxy;
     private postToHost;

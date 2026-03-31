@@ -86,6 +86,50 @@ export class GatherPlugin {
             body: JSON.stringify(options),
         });
     }
+    // --- Presets API ---
+    /**
+     * List all presets saved by this plugin in the workspace.
+     * Requires scope: presets:read
+     */
+    async listPresets() {
+        const res = await this.proxyFetch("/api/plugin-proxy/presets");
+        return res.presets;
+    }
+    /**
+     * Get a single preset by its key.
+     * Returns null if the preset does not exist.
+     * Requires scope: presets:read
+     */
+    async getPreset(key) {
+        try {
+            const res = await this.proxyFetch(`/api/plugin-proxy/presets/${encodeURIComponent(key)}`);
+            return res.preset;
+        }
+        catch {
+            return null;
+        }
+    }
+    /**
+     * Create or update a preset. If a preset with the given key already exists,
+     * it will be overwritten.
+     * Requires scope: presets:write
+     */
+    async savePreset(options) {
+        const res = await this.proxyFetch("/api/plugin-proxy/presets", {
+            method: "POST",
+            body: JSON.stringify(options),
+        });
+        return res.preset;
+    }
+    /**
+     * Delete a preset by its key.
+     * Requires scope: presets:write
+     */
+    async deletePreset(key) {
+        await this.proxyFetch(`/api/plugin-proxy/presets/${encodeURIComponent(key)}`, {
+            method: "DELETE",
+        });
+    }
     /** Get a service proxy for making proxied calls to workspace services. */
     service(serviceName) {
         return {
