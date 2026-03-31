@@ -44,6 +44,22 @@ export interface AddCommentOptions {
   timecodeMs?: number;
 }
 
+export interface Preset {
+  id: string;
+  key: string;
+  name: string;
+  data: Record<string, unknown>;
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SavePresetOptions {
+  key: string;
+  name: string;
+  data: Record<string, unknown>;
+}
+
 export interface ServiceProxy {
   /** Check if a service is available in the workspace. */
   isAvailable(): Promise<boolean>;
@@ -152,6 +168,54 @@ export class GatherPlugin {
     return this.proxyFetch(`/api/plugin-proxy/plots/${plotId}/comments`, {
       method: "POST",
       body: JSON.stringify(options),
+    });
+  }
+
+  // --- Presets API ---
+
+  /**
+   * List all presets saved by this plugin in the workspace.
+   * Requires scope: presets:read
+   */
+  async listPresets(): Promise<Preset[]> {
+    const res = await this.proxyFetch("/api/plugin-proxy/presets");
+    return (res as { presets: Preset[] }).presets;
+  }
+
+  /**
+   * Get a single preset by its key.
+   * Returns null if the preset does not exist.
+   * Requires scope: presets:read
+   */
+  async getPreset(key: string): Promise<Preset | null> {
+    try {
+      const res = await this.proxyFetch(`/api/plugin-proxy/presets/${encodeURIComponent(key)}`);
+      return (res as { preset: Preset }).preset;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Create or update a preset. If a preset with the given key already exists,
+   * it will be overwritten.
+   * Requires scope: presets:write
+   */
+  async savePreset(options: SavePresetOptions): Promise<Preset> {
+    const res = await this.proxyFetch("/api/plugin-proxy/presets", {
+      method: "POST",
+      body: JSON.stringify(options),
+    });
+    return (res as { preset: Preset }).preset;
+  }
+
+  /**
+   * Delete a preset by its key.
+   * Requires scope: presets:write
+   */
+  async deletePreset(key: string): Promise<void> {
+    await this.proxyFetch(`/api/plugin-proxy/presets/${encodeURIComponent(key)}`, {
+      method: "DELETE",
     });
   }
 
